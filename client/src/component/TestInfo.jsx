@@ -55,6 +55,7 @@ const TestInfo = () => {
         marks: 1,
         options: [{ text: '', isCorrect: false }],
         correctAnswer: '',
+        markingRubric: '', // Initialize markingRubric here
       },
     ]);
   };
@@ -99,7 +100,6 @@ const TestInfo = () => {
     }
   };
 
-  // New: Delete Test handler
   const handleDeleteTest = async () => {
     if (!window.confirm('Are you sure you want to delete this test? This action cannot be undone.')) return;
 
@@ -112,7 +112,6 @@ const TestInfo = () => {
     }
   };
 
-  // New: Publish Test handler
   const handlePublish = async () => {
     if (!window.confirm('Are you sure you want to publish this test? This will notify all users.')) return;
 
@@ -129,7 +128,7 @@ const TestInfo = () => {
 
   return (
     <>
-    <Navbar/>
+      <Navbar />
       <div className="container">
         <h2>
           <input
@@ -212,13 +211,23 @@ const TestInfo = () => {
             )}
 
             {q.questionType === 'descriptive' && (
-              <textarea
-                className="descriptive-answer-input"
-                value={q.correctAnswer}
-                placeholder="Correct Answer (optional)"
-                onChange={(e) => handleQuestionChange(i, 'correctAnswer', e.target.value)}
-                rows={3}
-              />
+              <>
+                <textarea
+                  className="descriptive-answer-input"
+                  value={q.correctAnswer}
+                  placeholder="Correct Answer (optional)"
+                  onChange={(e) => handleQuestionChange(i, 'correctAnswer', e.target.value)}
+                  rows={3}
+                />
+                <textarea
+                  className="marking-rubric-input"
+                  value={q.markingRubric || ''}
+                  placeholder="Marking Rubric (explanation of how marks are awarded)"
+                  onChange={(e) => handleQuestionChange(i, 'markingRubric', e.target.value)}
+                  rows={3}
+                  style={{ marginTop: '10px' }}
+                />
+              </>
             )}
           </div>
         ))}
@@ -394,6 +403,15 @@ const TestInfo = () => {
           padding: 8px 12px;
           font-size: 14px;
           resize: vertical;
+        }
+        .marking-rubric-input {
+          width: 100%;
+          border-radius: 6px;
+          border: 1px solid #aaa;
+          padding: 8px 12px;
+          font-size: 14px;
+          resize: vertical;
+          margin-top: 10px;
         }
         .save-btn {
           width: 100%;

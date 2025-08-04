@@ -31,12 +31,12 @@ export const getAllTestsForStudent = async (req, res) => {
 // controllers/testController.js
 
 export const getTestssById = async (req, res) => {
-  const { id } = req.params;
-
+  const { testId } = req.params;
+  console.log("TestId this",testId)
   try {
     // Fetch the test by id from the Test collection
-    const test = await Test.findById(id).lean();
-    console.log("TestId",test)
+    const test = await Test.findById(testId).lean();
+    console.log("Test",test)
 
     if (!test) {
       return res.status(404).json({ message: "Test not found" });
@@ -109,39 +109,39 @@ export const verifyTestAccess = async (req, res) => {
 
 
 // Submit answers for a test
-export const submitTest = async (req, res) => {
-  try {
-    const { testId, answers } = req.body;
+// export const submitTest = async (req, res) => {
+//   try {
+//     const { testId, answers } = req.body;
 
-    const test = await Test.findById(testId);
-    if (!test) {
-      return res.status(404).json({ success: false, message: 'Test not found' });
-    }
+//     const test = await Test.findById(testId);
+//     if (!test) {
+//       return res.status(404).json({ success: false, message: 'Test not found' });
+//     }
 
-    let totalScore = 0;
+//     let totalScore = 0;
 
-    test.questions.forEach((q, index) => {
-      const studentAnswer = answers[q._id];
+//     test.questions.forEach((q, index) => {
+//       const studentAnswer = answers[q._id];
 
-      if (q.questionType === 'one-choice' || q.questionType === 'multiple-choice') {
-        const correctOptionIds = q.options.filter(opt => opt.isCorrect).map(opt => opt._id.toString());
-        const selectedOptionIds = (studentAnswer || []).map(id => id.toString());
+//       if (q.questionType === 'one-choice' || q.questionType === 'multiple-choice') {
+//         const correctOptionIds = q.options.filter(opt => opt.isCorrect).map(opt => opt._id.toString());
+//         const selectedOptionIds = (studentAnswer || []).map(id => id.toString());
 
-        const isCorrect = q.questionType === 'one-choice'
-          ? correctOptionIds.length === 1 && correctOptionIds[0] === selectedOptionIds[0]
-          : correctOptionIds.every(id => selectedOptionIds.includes(id)) &&
-            selectedOptionIds.every(id => correctOptionIds.includes(id));
+//         const isCorrect = q.questionType === 'one-choice'
+//           ? correctOptionIds.length === 1 && correctOptionIds[0] === selectedOptionIds[0]
+//           : correctOptionIds.every(id => selectedOptionIds.includes(id)) &&
+//             selectedOptionIds.every(id => correctOptionIds.includes(id));
 
-        if (isCorrect) {
-          totalScore += q.marks;
-        }
-      } else if (q.questionType === 'descriptive') {
-        // Optional: Handle subjective checking manually later
-      }
-    });
+//         if (isCorrect) {
+//           totalScore += q.marks;
+//         }
+//       } else if (q.questionType === 'descriptive') {
+//         // Optional: Handle subjective checking manually later
+//       }
+//     });
 
-    res.status(200).json({ success: true, message: 'Test submitted successfully', score: totalScore });
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+//     res.status(200).json({ success: true, message: 'Test submitted successfully', score: totalScore });
+//   } catch (error) {
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };

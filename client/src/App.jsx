@@ -10,6 +10,7 @@ import TeacherDashboard from './pages/teacherDashboard';
 import TestInfo from './component/TestInfo';
 import StudentTest from './component/StudentTest';
 import TestSecurity from './component/TestSecurity';
+import Rules from './component/Rules';
 
 
 function App() {
@@ -31,6 +32,8 @@ function App() {
         {/* New test routes */}
         <Route path="/dashboard/test/security/:testId" element={<TestSecurity />} />
         <Route path="/dashboard/test/start/:testId" element={<StudentTest />} />
+
+        <Route path="/dashboard/test/start/rule" element={<Rules/>} />
       </Routes>
     </Router>
   );

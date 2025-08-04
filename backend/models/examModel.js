@@ -10,6 +10,7 @@ const questionSchema = new mongoose.Schema({
   questionType: { type: String, enum: ['one-choice', 'multiple-choice', 'descriptive'], required: true },
   options: [optionSchema],
   correctAnswer: { type: String },
+  markingRubric:{type:String},
   marks: { type: Number, required: true }
 });
 
