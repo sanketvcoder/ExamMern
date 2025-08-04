@@ -8,6 +8,7 @@ import autRoute from './routes/AuthRoutes/authRoute.js';
 import profileRoute from './routes/profileRoutes/profileRoute.js';
 import adminRoute from './routes/AdminRoute/adminRoute.js';
 import testRoute from './routes/TestRoute/testRoute.js';
+import studentRoute from './routes/StudentRoutes/studentRoutes.js';
 
 dotenv.config(); // Load .env variables
 
@@ -24,6 +25,7 @@ app.use('/api/auth',autRoute)
 app.use('/api/profile', profileRoute);
 app.use('/api/admin',adminRoute)
 app.use('/api/test', testRoute); 
+app.use('/api', studentRoute);
 // Connect to MongoDB
 connectDB()
   .then(() => {

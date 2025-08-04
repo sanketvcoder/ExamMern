@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
     enum: ['student', 'teacher', 'admin'],
     default: 'student',
   },
+  section:{
+    type:Array,
+    default: ["all"],
+  },
   resetPasswordOtp: {
     type: Number,
     default: 0,

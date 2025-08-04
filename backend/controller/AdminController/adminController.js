@@ -105,3 +105,39 @@ export const getUserWithProfileById = async (req, res) => {
   }
 };
 
+
+
+export const assignSectionToStudent = async (req, res) => {
+  const { userId, section } = req.body;
+
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ error: 'Only admin can assign sections.' });
+  }
+
+  if (!userId || !section) {
+    return res.status(400).json({ error: 'userId and section are required.' });
+  }
+
+  try {
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found.' });
+    }
+
+    if (user.role !== 'student') {
+      return res.status(400).json({ error: 'Cannot assign section to teachers or admins.' });
+    }
+
+    // One section only
+    user.section = [section];
+    await user.save();
+
+    res.status(200).json({ message: 'Section assigned successfully.', user });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Failed to assign section.' });
+  }
+};
+
+

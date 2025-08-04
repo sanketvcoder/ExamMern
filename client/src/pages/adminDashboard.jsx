@@ -3,13 +3,14 @@ import Navbar from '../component/Navbar';
 
 const AdminDashboard = () => {
   const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null); // for viewing profile
+  const [selectedUser, setSelectedUser] = useState(null);
   const [roleToUpdate, setRoleToUpdate] = useState('');
   const [updatingUserId, setUpdatingUserId] = useState(null);
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [sectionToAssign, setSectionToAssign] = useState('');
 
-  // Fetch all users on component mount
   useEffect(() => {
-    fetch('http://localhost:5000/api/admin/all', { credentials: 'include' })  // adjust base URL as needed
+    fetch('http://localhost:5000/api/admin/all', { credentials: 'include' })
       .then(res => res.json())
       .then(data => setUsers(data))
       .catch(console.error);
@@ -17,7 +18,6 @@ const AdminDashboard = () => {
 
   const handleDelete = async (userId) => {
     if (!window.confirm('Are you sure to delete this user?')) return;
-
     try {
       const res = await fetch(`http://localhost:5000/api/admin/${userId}`, {
         method: 'DELETE',
@@ -31,7 +31,7 @@ const AdminDashboard = () => {
       } else {
         alert(json.error || 'Delete failed');
       }
-    } catch (error) {
+    } catch {
       alert('Error deleting user');
     }
   };
@@ -47,13 +47,9 @@ const AdminDashboard = () => {
       } else {
         alert(data.error || 'Failed to fetch profile');
       }
-    } catch (error) {
+    } catch {
       alert('Failed to fetch profile');
     }
-  };
-
-  const handleRoleChange = (e) => {
-    setRoleToUpdate(e.target.value);
   };
 
   const handleUpdateRole = async () => {
@@ -78,8 +74,42 @@ const AdminDashboard = () => {
       } else {
         alert(json.error || 'Update failed');
       }
-    } catch (error) {
+    } catch {
       alert('Error updating role');
+    }
+  };
+
+  const handleBulkAssignSection = async () => {
+    if (selectedStudents.length === 0) {
+      alert('Select at least one student');
+      return;
+    }
+    if (!sectionToAssign.trim()) {
+      alert('Enter a valid section name');
+      return;
+    }
+
+    try {
+      await Promise.all(
+        selectedStudents.map(userId =>
+          fetch('http://localhost:5000/api/admin/assign-section', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ userId, section: sectionToAssign }),
+          })
+        )
+      );
+
+      alert(`Assigned section "${sectionToAssign}" to ${selectedStudents.length} students`);
+      setSectionToAssign('');
+      setSelectedStudents([]);
+
+      const refreshed = await fetch('http://localhost:5000/api/admin/all', { credentials: 'include' });
+      const data = await refreshed.json();
+      setUsers(data);
+    } catch {
+      alert('Failed to assign section');
     }
   };
 
@@ -88,13 +118,30 @@ const AdminDashboard = () => {
       <Navbar />
       <h1>Admin Dashboard</h1>
 
+      <div className="section-bar">
+        <input
+          type="text"
+          placeholder="Enter section name (e.g., A, B)"
+          value={sectionToAssign}
+          onChange={(e) => setSectionToAssign(e.target.value)}
+        />
+        <button
+          onClick={handleBulkAssignSection}
+          disabled={!sectionToAssign.trim() || selectedStudents.length === 0}
+        >
+          Assign Section to Selected
+        </button>
+      </div>
+
       <div className="users-section">
         <h2>All Users</h2>
         <table>
           <thead>
             <tr>
+              <th>Select</th>
               <th>Email</th>
               <th>Role</th>
+              <th>Section</th>
               <th>View Profile</th>
               <th>Update Role</th>
               <th>Delete</th>
@@ -103,8 +150,24 @@ const AdminDashboard = () => {
           <tbody>
             {users.map(user => (
               <tr key={user._id}>
+                <td>
+                  {user.role === 'student' && (
+                    <input
+                      type="checkbox"
+                      checked={selectedStudents.includes(user._id)}
+                      onChange={(e) => {
+                        setSelectedStudents(prev =>
+                          e.target.checked
+                            ? [...prev, user._id]
+                            : prev.filter(id => id !== user._id)
+                        );
+                      }}
+                    />
+                  )}
+                </td>
                 <td>{user.email}</td>
                 <td>{user.role}</td>
+                <td>{user.section?.[0] || 'all'}</td>
                 <td><button onClick={() => handleViewProfile(user._id)}>View</button></td>
                 <td>
                   <select
@@ -149,13 +212,13 @@ const AdminDashboard = () => {
 
       <style>{`
         .admin-dashboard {
-          max-width: 900px;
+          max-width: 1000px;
           margin: 20px auto;
-          font-family: Arial, sans-serif;
           padding: 20px;
+          font-family: Arial, sans-serif;
           background: #f8f9fa;
           border-radius: 8px;
-          box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
         }
         h1, h2 {
           text-align: center;
@@ -209,6 +272,25 @@ const AdminDashboard = () => {
           width: 150px;
           margin-left: auto;
           margin-right: auto;
+        }
+        .section-bar {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 20px;
+        }
+        .section-bar input {
+          padding: 6px;
+          border-radius: 4px;
+          border: 1px solid #ccc;
+          width: 200px;
+        }
+        .section-bar button {
+          background-color: #28a745;
+        }
+        .section-bar button:hover {
+          background-color: #218838;
         }
       `}</style>
     </div>
