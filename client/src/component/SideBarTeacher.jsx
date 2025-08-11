@@ -15,6 +15,12 @@ const SideBarTeacher = ({ onSelect, selected }) => {
       >
         📋 All Tests
       </button>
+      <button
+        className={`sidebar-btn ${selected === 'result' ? 'active' : ''}`}
+        onClick={() => onSelect('result')}
+      >
+        🏁 Result
+      </button>
 
       <style>{`
         .sidebar {

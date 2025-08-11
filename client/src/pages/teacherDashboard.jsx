@@ -3,6 +3,7 @@ import CreateTestForm from './CreateTestForm';
 import SideBarTeacher from '../component/SideBarTeacher';
 import AllTests from '../component/AllTest';
 import Navbar from '../component/Navbar';
+import ResultView from '../component/ResultView';
 
 
 
@@ -17,6 +18,7 @@ const TeacherDashboard = () => {
       <div className="main-content">
         {view === 'create' && <CreateTestForm />}
         {view === 'all' && <AllTests />}
+        {view === 'result' && <ResultView />}
       </div>
 
       <style>{`
